@@ -3,37 +3,28 @@
 
   let cellElements = {};
 
-  const onChange = (value, rowIndex, cellIndex, e) => {
-    if (value.length <= 1 && '123456789'.includes(value)) {
-      // weird cause svelte sucks at nested arrays
-      rows[rowIndex] = rows[rowIndex].map((cell, ci) => ci === cellIndex ? value : cell) 
-    }
-
-    e.currentTarget.value = rows[rowIndex][cellIndex]; // weird svelte hack to keep control
-  }
-
-  /* $: console.log(rows) */
-  /* $: console.log('cellElements:', cellElements) */
-
   const cellId = (rowIndex, cellIndex) => `${rowIndex}-${cellIndex}`;
 
-  const moveCursor = (keyCode, rowIndex, cellIndex) => {
-    if (keyCode === 37 && cellIndex > 0) {
+  const onKeyDown = (event, rowIndex, cellIndex) => {
+    if ('123456789'.includes(event.key)) {
+      rows[rowIndex] = rows[rowIndex].map((cell, ci) => ci === cellIndex ? event.key : cell) 
+    }
+
+    if (event.key === 'ArrowLeft' && cellIndex > 0) {
       cellElements[cellId(rowIndex, cellIndex - 1)].focus();
     }
 
-    if (keyCode === 38 && rowIndex > 0) {
+    if (event.key === 'ArrowUp' && rowIndex > 0) {
       cellElements[cellId(rowIndex - 1, cellIndex)].focus();
     }
 
-    if (keyCode === 39 && cellIndex < 8) {
+    if (event.key === 'ArrowRight' && cellIndex < 8) {
       cellElements[cellId(rowIndex, cellIndex + 1)].focus();
     }
 
-    if (keyCode === 40 && rowIndex < 8) {
+    if (event.key === 'ArrowDown' && rowIndex < 8) {
       cellElements[cellId(rowIndex + 1, cellIndex)].focus();
     }
-
   }
 
 </script>
@@ -49,8 +40,7 @@
 					class='cell'
 					class:border-right={(cellIndex + 1) % 3 === 0}
           value={cell}
-          on:keydown={e => moveCursor(e.keyCode, rowIndex, cellIndex)}
-          on:input={e => onChange(e.currentTarget.value, rowIndex, cellIndex, e)}
+          on:keydown|preventDefault={e => onKeyDown(e, rowIndex, cellIndex)}
         />
       {/each}
       </div>
