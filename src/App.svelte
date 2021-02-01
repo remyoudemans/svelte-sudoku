@@ -3,12 +3,6 @@
 
   let cellElements = {};
 
-  const getRowClassName = rowIndex =>
-    (rowIndex + 1) % 3 === 0 ? 'border-bottom' : '';
-
-  const getCellClassName = cellIndex =>
-    (cellIndex + 1) % 3 === 0 ? 'border-right' : '';
-
   const onChange = (value, rowIndex, cellIndex, e) => {
     if (value.length <= 1 && '123456789'.includes(value)) {
       // weird cause svelte sucks at nested arrays
@@ -47,12 +41,13 @@
 <main>
   <div class='grid'>
     {#each rows as row, rowIndex}
-      <div class={getRowClassName(rowIndex)}>
+      <div class:border-bottom={(rowIndex + 1) % 3 === 0}>
       {#each row as cell, cellIndex}
         <input
           bind:this={cellElements[cellId(rowIndex, cellIndex)]}
           type='text'
-          class={`cell ${getCellClassName(cellIndex)}`}
+					class='cell'
+					class:border-right={(cellIndex + 1) % 3 === 0}
           value={cell}
           on:keydown={e => moveCursor(e.keyCode, rowIndex, cellIndex)}
           on:input={e => onChange(e.currentTarget.value, rowIndex, cellIndex, e)}
